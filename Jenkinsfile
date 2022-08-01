@@ -9,7 +9,7 @@ pipeline {
         }
         stage('build project') {
             steps {
-                sh './gradlew clean :app:assembleCertRelease'
+                sh './gradlew clean :app:assembleCertDebug'
             }
         }
         stage('publish project'){
