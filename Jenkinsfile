@@ -14,7 +14,7 @@ pipeline {
         }
         stage('publish project'){
             steps{
-                archiveArtifacts artifacts: 'app/build/outputs/apk/debug/*.apk', followSymlinks: false
+                archiveArtifacts artifacts: 'app/build/outputs/apk/cert/debug/*.apk', followSymlinks: false
             }
 
         }
