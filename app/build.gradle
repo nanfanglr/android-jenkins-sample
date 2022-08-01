@@ -13,14 +13,63 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        flavorDimensions "default"
+    }
+
+    signingConfigs {
+        release {
+            keyAlias 'chuanyutang'
+            keyPassword '123456'
+            storeFile file('chuanyutang.jks')
+            storePassword '123456'
+        }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            debuggable false
+            minifyEnabled true
+            zipAlignEnabled true
+            multiDexEnabled true
+            shrinkResources true    // 移除无用的resource文件
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+            zipAlignEnabled true
+//            shrinkResources true    // 移除无用的resource文件
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            multiDexEnabled true
         }
     }
+
+    productFlavors {
+        product {}
+        cert {}
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def fileName
+            if (outputFileName != null && outputFileName.endsWith('.apk')) {
+                // 输出apk名称为android-jenkins-sample-release-v1.0.0
+                if (variant.buildType.name == 'release') {
+                    fileName = "android-jenkins-sample-${variant.productFlavors[0].name}-release-v${defaultConfig.versionName}.apk"
+                } else if (variant.buildType.name == 'debug') {
+                    fileName = "android-jenkins-sample-${variant.productFlavors[0].name}-debug-v${defaultConfig.versionName}.apk"
+                }
+                outputFileName = fileName
+            }
+        }
+    }
+
+    dexOptions {
+        jumboMode true
+        javaMaxHeapSize "4g"
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -31,7 +80,6 @@ android {
 }
 
 dependencies {
-
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.4.0'
