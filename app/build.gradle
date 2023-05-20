@@ -1,3 +1,5 @@
+import java.lang.reflect.Executable
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
@@ -112,11 +114,42 @@ gradle.afterProject {
 }
 gradle.projectsEvaluated {
     println "APP子项目.gradle.projectsEvaluated"
+    exec {
+        executable "${project.projectDir}/test.sh"
+    }
 }
 gradle.taskGraph.whenReady {
     println "APP子项目.gradle.taskGraph.whenReady"
 }
 
 tasks.whenTaskAdded { Task task ->
-    println "app.whenTaskAdded : "+task.name
+    println "app.whenTaskAdded : " + task.name
+    //删除libc++_shared.so文件，除zoom sdk 里面以外
+    if (task.name.startsWith("merge") && task.name.endsWith("NativeLibs")) {
+        task.doFirst { Task t ->
+            Set<String> toBeDeletedSoPathSet = new HashSet<>()
+            t.inputs.files.each {
+                File file -> collectToBeDeletedSoPath(new File(file.absolutePath), toBeDeletedSoPathSet)
+            }
+            toBeDeletedSoPathSet.each {
+                String p -> new File(p).delete()
+            }
+        }
+    }
+}
+
+def collectToBeDeletedSoPath(File file, Set<String> toBeDeletedSoPathSet) {
+    if (file == null) {
+        return
+    }
+    if (file.isDirectory()) {
+        file.listFiles().each { File f ->
+            collectToBeDeletedSoPath(f, toBeDeletedSoPathSet)
+        }
+        return
+    }
+    def path = file.absolutePath
+    if (path.endsWith("arm64-v8a/libc++_shared.so") && !path.contains("mobilertc")) {
+        toBeDeletedSoPathSet.add(path)
+    }
 }
