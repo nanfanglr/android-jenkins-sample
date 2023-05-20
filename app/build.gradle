@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdk 28
+    compileSdk 31
 
     defaultConfig {
         applicationId "com.rui.android_jenkins_sample"
         minSdk 23
-        targetSdk 28
+        targetSdk 31
         versionCode 1
         versionName "1.0"
 
@@ -87,4 +87,36 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+}
+
+println "APP子项目配置开始---"
+
+afterEvaluate {
+    println "APP子项目afterEvaluate回调..."
+}
+
+task appTest {
+    println "APP子项目里任务配置---"
+    doLast {
+        println "执行子项目任务..."
+    }
+}
+
+println "APP子项目配置结束---"
+
+gradle.beforeProject {
+    println "APP子项目.gradle.beforeProject"
+}
+gradle.afterProject {
+    println "APP子项目.gradle.afterProject"
+}
+gradle.projectsEvaluated {
+    println "APP子项目.gradle.projectsEvaluated"
+}
+gradle.taskGraph.whenReady {
+    println "APP子项目.gradle.taskGraph.whenReady"
+}
+
+tasks.whenTaskAdded { Task task ->
+    println "app.whenTaskAdded : "+task.name
 }

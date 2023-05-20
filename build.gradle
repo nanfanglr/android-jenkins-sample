@@ -25,3 +25,31 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+// gradle生命周期 https://www.jianshu.com/p/2e19268bf387
+// gradle生命周期 https://juejin.cn/post/7022954104670388254
+
+//对子模块进行配置
+subprojects { sub ->
+    sub.beforeEvaluate { proj ->
+        println "子项目beforeEvaluate回调..."
+    }
+}
+
+println "根项目配置开始---"
+
+
+
+task rootTest {
+    println "根项目里任务配置---"
+    doLast {
+        println "执行根项目任务..."
+    }
+}
+
+println "根项目配置结束---"
+
+this.afterEvaluate {
+    println "根项目 afterEvaluate"
+}
+
